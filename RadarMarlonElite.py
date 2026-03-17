@@ -6,7 +6,7 @@ from datetime import date
 # --- CONFIGURACIÓN DE APARIENCIA PROFESIONAL ---
 st.set_page_config(page_title="Marlon Pro Elite", layout="wide")
 
-# Este bloque oculta el botón de "Alojado con Streamlit" y el menú superior
+# Ocultar rastro de Streamlit para que parezca una App propia
 hide_style = """
     <style>
     #MainMenu {visibility: hidden;}
@@ -17,12 +17,17 @@ hide_style = """
     """
 st.markdown(hide_style, unsafe_allow_html=True)
 
-# --- INICIO DE PÁGINA PERSONALIZADO ---
+# --- INICIO DE PÁGINA PERSONALIZADO (FRASE EDITADA) ---
 st.markdown("""
-    <div style="text-align: center; padding: 20px; background-color: #1e293b; border-radius: 15px; border-bottom: 5px solid #facc15; margin-bottom: 30px;">
-        <h1 style="color: #ffffff; margin: 0; font-size: 35px;">🛡️ MARLON PRO ELITE</h1>
-        <p style="color: #facc15; font-size: 18px; font-weight: bold; margin-top: 10px;">Inteligencia Artificial aplicada al Análisis Deportivo</p>
-        <p style="color: #cbd5e1; font-size: 14px;">Bienvenido al centro de mando. Datos actualizados en tiempo real.</p>
+    <div style="text-align: center; padding: 25px; background-color: #000000; border-radius: 15px; border: 2px solid #38bdf8; margin-bottom: 30px;">
+        <h1 style="color: #ffffff; margin: 0; font-size: 32px; font-family: sans-serif;">🛡️ MARLON PRO ELITE</h1>
+        <p style="color: #ffffff; font-size: 20px; font-weight: bold; margin-top: 15px; letter-spacing: 0.5px;">
+            Inteligencia y Análisis Aplicado a lo Deportivo
+        </p>
+        <div style="height: 3px; background: linear-gradient(90deg, #38bdf8, #facc15); width: 60%; margin: 15px auto;"></div>
+        <p style="color: #38bdf8; font-size: 14px; text-transform: uppercase; font-weight: bold;">
+            Centro de Mando Personalizado
+        </p>
     </div>
     """, unsafe_allow_html=True)
 
