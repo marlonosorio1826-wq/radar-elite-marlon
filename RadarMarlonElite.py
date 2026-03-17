@@ -2,18 +2,29 @@ import streamlit as st
 import requests
 from datetime import date
 
-# 1. ESTILO PROFESIONAL TOTAL Y COLORES
-st.set_page_config(page_title="Marlon Pro: Terminal de Apuestas", layout="wide")
-st.markdown("""
-    <style>
-    .main { background-color: #0e1117; color: white; }
-    .prediction-box { background-color: #1e293b; padding: 15px; border-radius: 10px; border-top: 4px solid #facc15; margin-bottom: 15px; margin-top: 15px; }
-    .live-tag { background-color: #ef4444; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; animation: blinker 1.5s linear infinite; }
-    @keyframes blinker { 50% { opacity: 0; } }
-    </style>
-    """, unsafe_allow_html=True)
 
-st.title("🛡️ Marlon Pro: Inteligencia Deportiva Total")
+# --- CONFIGURACIÓN DE APARIENCIA PROFESIONAL ---
+st.set_page_config(page_title="Marlon Pro Elite", layout="wide")
+
+# Este bloque oculta el botón de "Alojado con Streamlit" y el menú superior
+hide_style = """
+    <style>
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+    .stDeployButton {display:none;}
+    </style>
+    """
+st.markdown(hide_style, unsafe_allow_html=True)
+
+# --- INICIO DE PÁGINA PERSONALIZADO ---
+st.markdown("""
+    <div style="text-align: center; padding: 20px; background-color: #1e293b; border-radius: 15px; border-bottom: 5px solid #facc15; margin-bottom: 30px;">
+        <h1 style="color: #ffffff; margin: 0; font-size: 35px;">🛡️ MARLON PRO ELITE</h1>
+        <p style="color: #facc15; font-size: 18px; font-weight: bold; margin-top: 10px;">Inteligencia Artificial aplicada al Análisis Deportivo</p>
+        <p style="color: #cbd5e1; font-size: 14px;">Bienvenido al centro de mando. Datos actualizados en tiempo real.</p>
+    </div>
+    """, unsafe_allow_html=True)
 
 # --- CONFIGURACIÓN DE LA CONEXIÓN ---
 API_KEY = "b7f271a62e0844b1ac5b1e19638dff75" 
@@ -99,49 +110,58 @@ def mostrar_analisis_partido(p, es_vivo=False):
                     col_g2.markdown(f'<div style="text-align:center; background:#1e293b; padding:15px; border-radius:8px; border-top: 4px solid #ef4444;"><p style="color:#cbd5e1; margin:0; font-weight:bold;">MÁS DE 2.5 (OVER)</p><h2 style="color:#ef4444; margin:5px 0;">{pct_over}</h2><p style="color:white; margin:0; font-size:16px;">Cuota: <span style="font-weight:bold; color:#ef4444;">{cuota_over}</span></p></div>', unsafe_allow_html=True)
                     col_g3.markdown(f'<div style="text-align:center; background:#1e293b; padding:15px; border-radius:8px; border-top: 4px solid #a855f7;"><p style="color:#cbd5e1; margin:0; font-weight:bold;">MENOS DE 2.5 (UNDER)</p><h2 style="color:#a855f7; margin:5px 0;">{pct_under}</h2><p style="color:white; margin:0; font-size:16px;">Cuota: <span style="font-weight:bold; color:#a855f7;">{cuota_under}</span></p></div>', unsafe_allow_html=True)
                     
-                   # --- PANEL DE CONSEJOS IA (MODIFICADO: ESPAÑOL Y ALTO CONTRASTE) ---
+                   # --- PANEL DE CONSEJOS IA (VERSIÓN FINAL ALTO CONTRASTE) ---
                     st.markdown("---")
                     st.markdown("### 🤖 Panel de Consejos IA")
                     
-                    # 1. TRADUCCIÓN LÓGICA DE CONSEJOS
+                    # 1. TRADUCCIÓN COMPLETA DE CONSEJOS
                     consejo_ia_raw = pred['predictions']['advice']
-                    # Diccionario básico de traducción para los mensajes más comunes de la API
+                    # Diccionario extendido para cubrir todas las frases de la API
                     traducciones = {
                         "Home win": "Victoria Local",
                         "Away win": "Victoria Visitante",
                         "Draw": "Empate",
                         "Double chance": "Doble Oportunidad",
-                        "Goals": "Goles",
-                        "and": "y",
-                        "or": "o"
+                        "High goals": "Muchos Goles",
+                        "Low goals": "Pocos Goles",
+                        "expected": "esperados",
+                        "draw or": "empate o",
+                        "or": "o",
+                        "and": "y"
                     }
                     
                     consejo_es = consejo_ia_raw
                     for eng, esp in traducciones.items():
-                        consejo_es = consejo_es.replace(eng, esp)
+                        # Usamos .lower() para que encuentre las palabras sin importar mayúsculas
+                        import re
+                        pattern = re.compile(re.escape(eng), re.IGNORECASE)
+                        consejo_es = pattern.sub(esp, consejo_es)
 
                     # 2. CÁLCULO DE GANADOR
-                    ganador_logico = "Empate / Muy ajustado"
+                    ganador_logico = "Empate / Incierto"
                     l_val = int(l_pct.replace('%','')) if l_pct != 'N/A' else 0
                     v_val = int(v_pct.replace('%','')) if v_pct != 'N/A' else 0
                     if l_val > v_val and l_val > 40: ganador_logico = f"Local ({p['teams']['home']['name']})"
                     elif v_val > l_val and v_val > 40: ganador_logico = f"Visitante ({p['teams']['away']['name']})"
 
                     # 3. CONSEJO DE GOLES
-                    consejo_gol_texto = "Apostar al OVER (+2.5) 🟢" if texto_goles == "+2.5" else ("Apostar al UNDER (-2.5) 🔴" if texto_goles == "-2.5" else "Incierto ⚪")
+                    consejo_gol_texto = "<span style='color:#00ff00;'>Más de 2.5 Goles 🟢</span>" if texto_goles == "+2.5" else ("<span style='color:#ff4b4b;'>Menos de 2.5 Goles 🔴</span>" if texto_goles == "-2.5" else "<span style='color:#ffffff;'>Incierto ⚪</span>")
 
-                    # DISEÑO DE ALTO CONTRASTE Y ESPAÑOL
+                    # DISEÑO DE MÁXIMA VISIBILIDAD (FONDO NEGRO, LETRA BLANCA)
                     st.markdown(f"""
-                        <div style="background-color: #0f172a; padding: 20px; border-radius: 10px; border: 2px solid #38bdf8;">
-                            <p style="font-size: 19px; margin-bottom: 12px; color: #FFFFFF !important; font-weight: 500;">
-                                👑 <b>Ganador Sugerido:</b> <span style="color: #facc15;">{ganador_logico}</span>
+                        <div style="background-color: #000000; padding: 25px; border-radius: 15px; border: 3px solid #38bdf8; margin-bottom: 20px;">
+                            <p style="font-size: 22px; color: #ffffff !important; margin-bottom: 15px; font-family: Arial, sans-serif;">
+                                👑 <b>Ganador Sugerido:</b> <br>
+                                <span style="color: #facc15; font-size: 24px; font-weight: 800;">{ganador_logico}</span>
                             </p>
-                            <p style="font-size: 19px; margin-bottom: 12px; color: #FFFFFF !important; font-weight: 500;">
-                                ⚽ <b>Pronóstico Goles:</b> {consejo_gol_texto}
+                            <p style="font-size: 22px; color: #ffffff !important; margin-bottom: 15px; font-family: Arial, sans-serif;">
+                                ⚽ <b>Pronóstico Goles:</b> <br>
+                                <span style="font-weight: 800; font-size: 22px;">{consejo_gol_texto}</span>
                             </p>
-                            <div style="background-color: #1e293b; padding: 10px; border-radius: 5px; margin-top: 10px;">
-                                <p style="font-size: 18px; margin-bottom: 0px; color: #FFFFFF !important;">
-                                    💡 <b>Veredicto IA:</b> <span style="color: #00ff00 !important; font-weight: bold;">{consejo_es}</span>
+                            <div style="background-color: #1a1a1a; padding: 15px; border-radius: 10px; border-left: 8px solid #00ff00;">
+                                <p style="font-size: 20px; color: #ffffff !important; margin: 0; font-family: Arial, sans-serif;">
+                                    💡 <b>VERDICTO FINAL:</b> <br>
+                                    <span style="color: #00ff00; font-weight: 900; font-size: 22px; text-transform: uppercase;">{consejo_es}</span>
                                 </p>
                             </div>
                         </div>
