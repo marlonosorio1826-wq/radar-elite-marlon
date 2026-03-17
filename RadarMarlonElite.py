@@ -30,7 +30,7 @@ st.markdown("""
     """, unsafe_allow_html=True)
 
 # --- 3. CONFIGURACIÓN API Y LIGAS EXTENDIDAS ---
-API_KEY = "6e034dd86fa0adda024699350e5f87d2" 
+API_KEY = "C87ba92780ea2434174c3f2969ed76eb" 
 HEADERS = {'x-rapidapi-key': API_KEY, 'x-rapidapi-host': "v3.football.api-sports.io"}
 
 # Lista extendida: Francia, España, Inglaterra, Portugal, Turquía, Alemania (Ligas 1 y 2)
