@@ -99,31 +99,56 @@ def mostrar_analisis_partido(p, es_vivo=False):
                     col_g2.markdown(f'<div style="text-align:center; background:#1e293b; padding:15px; border-radius:8px; border-top: 4px solid #ef4444;"><p style="color:#cbd5e1; margin:0; font-weight:bold;">MÁS DE 2.5 (OVER)</p><h2 style="color:#ef4444; margin:5px 0;">{pct_over}</h2><p style="color:white; margin:0; font-size:16px;">Cuota: <span style="font-weight:bold; color:#ef4444;">{cuota_over}</span></p></div>', unsafe_allow_html=True)
                     col_g3.markdown(f'<div style="text-align:center; background:#1e293b; padding:15px; border-radius:8px; border-top: 4px solid #a855f7;"><p style="color:#cbd5e1; margin:0; font-weight:bold;">MENOS DE 2.5 (UNDER)</p><h2 style="color:#a855f7; margin:5px 0;">{pct_under}</h2><p style="color:white; margin:0; font-size:16px;">Cuota: <span style="font-weight:bold; color:#a855f7;">{cuota_under}</span></p></div>', unsafe_allow_html=True)
                     
-                    # --- NUEVO: PANEL DE CONSEJOS IA ---
+                   # --- PANEL DE CONSEJOS IA (MODIFICADO: ESPAÑOL Y ALTO CONTRASTE) ---
                     st.markdown("---")
                     st.markdown("### 🤖 Panel de Consejos IA")
                     
-                    # Calculamos el ganador lógico
-                    ganador_logico = "Empate"
+                    # 1. TRADUCCIÓN LÓGICA DE CONSEJOS
+                    consejo_ia_raw = pred['predictions']['advice']
+                    # Diccionario básico de traducción para los mensajes más comunes de la API
+                    traducciones = {
+                        "Home win": "Victoria Local",
+                        "Away win": "Victoria Visitante",
+                        "Draw": "Empate",
+                        "Double chance": "Doble Oportunidad",
+                        "Goals": "Goles",
+                        "and": "y",
+                        "or": "o"
+                    }
+                    
+                    consejo_es = consejo_ia_raw
+                    for eng, esp in traducciones.items():
+                        consejo_es = consejo_es.replace(eng, esp)
+
+                    # 2. CÁLCULO DE GANADOR
+                    ganador_logico = "Empate / Muy ajustado"
                     l_val = int(l_pct.replace('%','')) if l_pct != 'N/A' else 0
                     v_val = int(v_pct.replace('%','')) if v_pct != 'N/A' else 0
                     if l_val > v_val and l_val > 40: ganador_logico = f"Local ({p['teams']['home']['name']})"
                     elif v_val > l_val and v_val > 40: ganador_logico = f"Visitante ({p['teams']['away']['name']})"
-                    elif l_val > 0: ganador_logico = "Empate / Partido muy cerrado"
 
-                    # Traducimos el consejo de goles
-                    consejo_gol_texto = "Apostar al OVER (+2.5) 🟢" if texto_goles == "+2.5" else ("Apostar al UNDER (-2.5) 🔴" if texto_goles == "-2.5" else "Mercado de goles incierto ⚪")
+                    # 3. CONSEJO DE GOLES
+                    consejo_gol_texto = "Apostar al OVER (+2.5) 🟢" if texto_goles == "+2.5" else ("Apostar al UNDER (-2.5) 🔴" if texto_goles == "-2.5" else "Incierto ⚪")
 
+                    # DISEÑO DE ALTO CONTRASTE Y ESPAÑOL
                     st.markdown(f"""
-                        <div style="background-color: #0f172a; padding: 20px; border-radius: 10px; border: 1px solid #38bdf8;">
-                            <p style="font-size: 16px; margin-bottom: 8px;">👑 <b>Ganador o Doble Chance:</b> La matemática favorece al <b>{ganador_logico}</b>.</p>
-                            <p style="font-size: 16px; margin-bottom: 8px;">⚽ <b>Pronóstico de Goles:</b> La IA recomienda <b>{consejo_gol_texto}</b>.</p>
-                            <p style="font-size: 16px; margin-bottom: 0px;">💡 <b>Veredicto Final del Algoritmo:</b> <i>"{pred['predictions']['advice']}"</i></p>
+                        <div style="background-color: #0f172a; padding: 20px; border-radius: 10px; border: 2px solid #38bdf8;">
+                            <p style="font-size: 19px; margin-bottom: 12px; color: #FFFFFF !important; font-weight: 500;">
+                                👑 <b>Ganador Sugerido:</b> <span style="color: #facc15;">{ganador_logico}</span>
+                            </p>
+                            <p style="font-size: 19px; margin-bottom: 12px; color: #FFFFFF !important; font-weight: 500;">
+                                ⚽ <b>Pronóstico Goles:</b> {consejo_gol_texto}
+                            </p>
+                            <div style="background-color: #1e293b; padding: 10px; border-radius: 5px; margin-top: 10px;">
+                                <p style="font-size: 18px; margin-bottom: 0px; color: #FFFFFF !important;">
+                                    💡 <b>Veredicto IA:</b> <span style="color: #00ff00 !important; font-weight: bold;">{consejo_es}</span>
+                                </p>
+                            </div>
                         </div>
                     """, unsafe_allow_html=True)
                     
                     st.markdown("<br>", unsafe_allow_html=True)
-
+                    
                     # 4. MERCADO DOBLE OPORTUNIDAD
                     if book:
                         bet_dc = next((b for b in book['bets'] if b['name'] == 'Double Chance'), None)
