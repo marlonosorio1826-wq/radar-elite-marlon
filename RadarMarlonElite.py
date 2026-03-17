@@ -49,7 +49,46 @@ def obtener_datos(endpoint, params=None):
     except: 
         return []
 
-menu = st.sidebar.radio("Módulo de Análisis:", ["🚀 EN VIVO (Live Analysis)", "📈 PRÓXIMOS (Pre-Match)"])
+# --- BOTONERA DE NAVEGACIÓN PROFESIONAL ---
+st.sidebar.markdown("""
+    <div style="background-color: #1e293b; padding: 15px; border-radius: 10px; border: 1px solid #38bdf8; margin-bottom: 20px;">
+        <p style="color: #38bdf8; font-size: 14px; font-weight: bold; text-transform: uppercase; text-align: center; margin-bottom: 10px;">
+            📡 Selector de Radar
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+# Usamos un estilo de botones segmentados que se ve mucho mejor en móvil
+modulo = st.sidebar.pills(
+    "Seleccione el tipo de análisis:",
+    ["EN VIVO (Live Analysis)", "PRÓXIMOS (Pre-Match)"],
+    selection_mode="single",
+    default="PRÓXIMOS (Pre-Match)"
+)
+
+st.sidebar.markdown("---")
+
+# --- ESTILO PARA HACER LOS BOTONES MÁS GRANDES ---
+st.markdown("""
+    <style>
+    /* Hace que los botones del menú (pills) sean más grandes y fáciles de tocar */
+    [data-testid="stBaseButton-pill"] {
+        width: 100%;
+        height: 50px;
+        font-size: 18px !important;
+        font-weight: bold !important;
+        border: 2px solid #38bdf8 !important;
+        background-color: #0f172a !important;
+        color: white !important;
+        margin-bottom: 10px;
+    }
+    /* Color cuando el botón está seleccionado */
+    [data-testid="stBaseButton-pillActive"] {
+        background-color: #38bdf8 !important;
+        color: #000000 !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
 def mostrar_analisis_partido(p, es_vivo=False):
     status = f"{p['fixture']['status']['elapsed']}'" if es_vivo else p['fixture']['date'][11:16]
